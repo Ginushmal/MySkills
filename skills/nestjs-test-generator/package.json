@@ -1,0 +1,12 @@
+{
+  "name": "nestjs-test-generator",
+  "version": "1.0.0",
+  "description": "Deterministic unit test generator for NestJS service classes",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/orchestrate.js"
+  },
+  "dependencies": {
+    "ts-morph": "^22.0.0"
+  }
+}
