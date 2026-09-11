@@ -6,41 +6,50 @@ description: >-
 
 # Generate LLM Pricing Report
 
-When asked to update or generate the LLM pricing comparison report, follow this exact procedure to ensure 100% accuracy based on a standardized benchmark.
+When asked to update or generate the LLM pricing comparison report, follow this exact multi-stage procedure to ensure the report reflects current community consensus and 100% accurate live pricing.
 
-## Step 1: Deploy Validation Sub-Agents
+## Phase 1: Discovery & Scouting (Community Consensus)
 
-Do NOT rely on your internal memory for prices, as they change rapidly. You must deploy sub-agents using `invoke_subagent` (model: `flash`) to gather live, exact pricing data from the official websites.
+First, discover what the developer community currently considers the best options. Deploy a swarm of `flash` sub-agents using `invoke_subagent` to scout the internet.
 
-Deploy 4 agents with these exact instructions:
-1. **Agent 1 (OpenRouter Validator):** "Visit https://openrouter.ai/models. Find exact per-1M-token input and output prices for: Gemini Flash, DeepSeek V3/R1, Qwen 2.5 72B, Qwen Max, Claude 3.5 Sonnet, and Kimi K3. Note prompt caching discounts."
-2. **Agent 2 (DeepInfra Validator):** "Visit https://deepinfra.com/pricing. Find exact per-1M-token input and output prices for: DeepSeek V3, Qwen 2.5 72B, Qwen Max, Kimi models. Note standard vs flex tier pricing."
-3. **Agent 3 (Subscriptions Validator):** "Visit opencode.ai/go, poe.com, and cursor.com/pricing. What is the exact monthly cost? What are the hard caps/limits? (e.g. Open Code Go $60 usage value multiplier, Cursor 500 fast requests, Poe 660,000 points)."
-4. **Agent 4 (Direct APIs Validator):** "Visit api.deepseek.com and docs.anthropic.com. Get exact 1M-token input/output prices for deepseek-flash (peak vs off-peak and cache hit) and Claude 3.5 Sonnet (cache write vs cache read)."
+1. **Agent 1 (Reddit & Quora Researcher):** "Search Reddit (r/LocalLLaMA, r/ChatGPTCoding, etc.) and Quora for recent discussions about the best LLM API aggregators and subscriptions for agentic coding. Look for platforms that support 3 tiers (cheap, mid-tier, top-tier). What are the community favorites and their pros/cons?"
+2. **Agent 2 (Hacker News & Dev Blogs Researcher):** "Search Hacker News, Dev.to, and developer blogs for recent articles comparing LLM API providers (aggregators vs subscriptions) for agentic coding. Summarize the prevailing opinions on price-to-value ratio and developer experience."
+3. **Agent 3 (General Web & YouTube Researcher):** "Search the general web and YouTube summaries for reviews on the 'best LLM subscription or pay-as-you-go API for coding'. Note their relative performance, quotas, and hidden costs."
 
-Wait for all 4 agents to return before proceeding.
+Wait for all Phase 1 agents to return. Based on their findings, identify the top ~6 platforms (including top aggregators, direct APIs, and popular IDE/subscriptions).
 
-## Step 2: The Standardized Benchmark Math
+## Phase 2: Live Price Validation
 
-Once you have the raw prices, you MUST calculate the cost using this exact standardized "Standard Coding Task" metric:
-- **Input Tokens:** 20,000
-- **Output Tokens:** 1,000
+Do NOT rely on your internal memory for prices. You must deploy a second swarm of `flash` sub-agents to gather live, exact pricing data from the official websites of the platforms identified in Phase 1 (always including the user's baselines: Open Code Go and Gemini AI Pro).
+
+Deploy the following types of agents:
+1. **Aggregator Validators (e.g., OpenRouter, DeepInfra):** Find exact per-1M-token input/output prices for a Cheap model (e.g., DeepSeek/Gemini Flash), a Mid-Tier model (e.g., Qwen 72B), and a Top-Tier model (e.g., Claude 3.5 Sonnet, Qwen Max, Kimi K3). Note any deposit fees or prompt caching discounts.
+2. **Subscription Validators (e.g., Cursor, Poe, Open Code Go, Gemini AI Pro):** Find the exact monthly cost, hard caps/limits (e.g. usage value multipliers, fast request counts, compute points, compute quotas), and available models.
+3. **Direct API Validators (e.g., Anthropic, DeepSeek):** Find exact 1M-token input/output prices, peak vs off-peak rates, and exact prompt caching (read/write) rates.
+
+Wait for all Phase 2 agents to return before proceeding.
+
+## Phase 3: The Standardized Benchmark Math
+
+Once you have the raw prices, you MUST calculate the cost using this exact standardized "Standard Coding Task" metric so platforms can be compared equally:
+- **Input Tokens:** 20,000 (System prompt + codebase read)
+- **Output Tokens:** 1,000 (Code generated)
 - **Formula:** `Cost = (20,000 / 1,000,000 * Input Price) + (1,000 / 1,000,000 * Output Price)`
 - **Tasks per $10:** `10 / Cost`
 
-## Step 3: Generate the Final Report
+## Phase 4: Generate the Final Report
 
 Use `write_to_file` to create a markdown artifact named `llm_pricing_update_<YYYY-MM>.md`.
 
 The report must follow this exact structure:
 
 1. **Header & Context:** Explain the Standard Coding Task metric (20k in, 1k out).
-2. **Tier 1 (Cheap/Fast):** A table comparing DeepSeek Direct, DeepInfra, OpenRouter, Open Code Go, Poe, Gemini AI Pro based on Tasks per $10.
-3. **Tier 2 (Mid-Tier):** A table comparing DeepInfra (Qwen 72B), OpenRouter, etc. based on Tasks per $10.
-4. **Tier 3 (Top-Tier):** A table comparing OpenRouter (Claude cached, Qwen Max), DeepInfra (Qwen Max), Cursor, Poe.
+2. **Tier 1 (Cheap/Fast):** A table comparing the top budget options based on Tasks per $10.
+3. **Tier 2 (Mid-Tier):** A table comparing mid-tier reasoning models based on Tasks per $10.
+4. **Tier 3 (Top-Tier):** A table comparing frontier models (Claude, Qwen Max, Kimi) based on Tasks per $10, highlighting prompt caching impact.
 5. **The Unified Final Ranking:** A master table comparing Monthly Cost, Tier Access, and the biggest pros/cons.
 
 **Crucial Rules for the Output:**
-- Separate Open Code Go and Gemini AI Pro with a ⭐ to note they are user baselines.
-- Explicitly highlight if Poe passes through prompt caching (it doesn't) and if DeepInfra has Claude (it doesn't).
-- Always recommend a Tiered API Architecture (OpenRouter or DeepInfra) over flat consumer subscriptions for heavy agentic coding loops.
+- Separate the user's baseline subscriptions (Open Code Go and Gemini AI Pro) with a ⭐ to note they are baselines.
+- Explicitly highlight if a platform passes through prompt caching (e.g., OpenRouter) or if it doesn't (e.g., Poe).
+- Clearly expose marketing gimmicks (like "$10 gives $60 usage value" or "compute points") by reducing them to the "Tasks per $10" metric.
