@@ -35,6 +35,9 @@ Run from the target project root:
 # See what this repo offers
 npx skills add Ginushmal/MySkills --list
 
+# Pick skills interactively (recommended)
+npx skills add Ginushmal/MySkills
+
 # Install one skill into the detected agent
 npx skills add Ginushmal/MySkills --skill adr-management
 
@@ -47,6 +50,37 @@ npx skills add Ginushmal/MySkills --all
 # Install globally so it is available in every project
 npx skills add Ginushmal/MySkills --skill adr-management -g
 ```
+
+### Interactive selection
+
+Omitting `--skill` opens a multi-select prompt listing every skill in the repo, with each
+skill's description as a hint:
+
+```text
+│  Select skills to install
+│  Search: _
+│  ↑↓ move, space select, ctrl+a select all, enter confirm
+│
+│ ❯ ◯ Select All (0/8)
+│   ────────────────────────────────────
+│   ◯ adr-management (Use this skill ONLY when proposing a SIGNIFICANT…)
+│   ◯ agentic-project-init (Use to initialize a new web project…)
+│   ◯ agents-docs-refactor (Use periodically…)
+│   ◯ agents-docs-sync (Use when a new rule, convention, tool…)
+│   ◯ generate-commit-message (Generate a conventional commit message…)
+│   ◯ generate-llm-pricing-report (Use this skill to research, validate…)
+│   ◯ nestjs-test-generator (MANDATORY SKILL FOR ALL TESTING…)
+│   ◯ ocr-change-review (Use after an OpenSpec change is applied…)
+│
+│  Selected: (none)
+└
+```
+
+Keys: `↑`/`↓` move, `space` toggle, `ctrl+a` select all, type to filter, `enter` confirm.
+After confirming skills, a second prompt asks which agents to install to.
+
+The prompt only appears on a real terminal. In CI, in a pipe, or when a coding agent is detected,
+the CLI installs non-interactively instead — pass `--skill` explicitly there.
 
 Skills land in `.agents/skills/<name>/` (the shared location for GitHub Copilot, Codex, Cursor,
 Gemini CLI, OpenCode and others) and are recorded in `skills-lock.json`, which should be committed
