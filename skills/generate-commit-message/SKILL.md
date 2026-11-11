@@ -1,5 +1,5 @@
 ---
-name: Generate Commit Message
+name: generate-commit-message
 description: Generate a conventional commit message and description from the git diff, optionally using a task ID or description.
 ---
 # Generate Commit Message

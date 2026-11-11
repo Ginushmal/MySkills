@@ -1,35 +1,71 @@
 ---
 name: adr-management
 description: >-
-  Use this skill ONLY when proposing a SIGNIFICANT architecture-changing decision (e.g., adding a major new framework, changing core tensor shape representations, or altering the overarching system design). DO NOT use this skill for minor refactors, simple bug fixes, or routine configuration tweaks.
+  Use this skill ONLY when proposing a SIGNIFICANT architecture-changing decision (for
+  example: adopting a major framework, changing the process topology, the queue, the
+  rendering engine, the AI orchestration layer, the observability model, or a project-wide
+  rule). DO NOT use it for minor refactors, routine configuration, or feature-level design —
+  those belong in OpenSpec specs.
 ---
 
 # ADR Management
 
-As an AI working on this project, you have access to the ADR Management System. 
+Architecture decisions live in `.docs/adr/`, one numbered file per decision, using
+`.docs/adr/template.md`. The index is `.docs/adr/README.md`. This project does **not**
+require `pixi` or `adr-tools`; the repository is the source of truth. An optional legacy
+script (`.agents/skills/adr-management/scripts/search_adrs.py`) can index ADRs semantically
+with Chroma, but plain text search is the default and needs no Python dependencies.
 
-> **CRITICAL RULE - WHEN TO USE THIS SKILL:**
-> Do **NOT** write an ADR for every small change. Only trigger this workflow for major, project-altering decisions such as:
-> - Adopting a new major library or framework.
-> - Radically altering the `Structure of Arrays` (SoA) data model or tensor shapes.
-> - Changing the core algorithms (like the reward math or genetic crossover).
+> **When to write an ADR**
+> Only for decisions that are expensive to reverse:
+> - a new major framework, language, database, broker or rendering engine;
+> - a change to the process topology or a package boundary;
+> - a change to a cross-cutting rule (tenancy, idempotency, security, cost model);
+> - a decision that supersedes an existing ADR.
+>
+> Feature behavior, UI details and implementation steps belong in OpenSpec changes.
 
-## How to Use Your Skill:
-> **IMPORTANT:** Always run these commands from the repository root (`E:\Projects_and_Competitions\CivilizationSimulation`). Do not run them from within the `.agents` or `scripts` folders.
+## Workflow
 
-1. **Search First:** Before making a decision, run the semantic search script from the repository root to see if we have already made a rule about this:
-   `pixi run search_adr "<your natural language query>"`
-2. **Read:** If the search returns an ADR ID (e.g., `0004`), read the actual file (`docs/adr/0004-*.md`) to understand the context. Pay attention to the "Status" field to ensure it isn't superseded.
-3. **Write:** To propose a new architecture decision, DO NOT manually create the file. Use the native `npryce/adr-tools` wrapper via pixi:
-   `pixi run adr new "Title of the Decision"`
-   This will automatically generate the correctly numbered file in `docs/adr/`. Once generated, open the file and fill in the Context, Decision, and Consequences sections.
-4. **Link / Supersede:** If your new ADR supersedes an old one, use the `-s` flag to auto-link them:
-   `pixi run adr new -s 4 "Title of the New Decision"`
-   You can also create custom links between existing ADRs without creating a new file:
-   `pixi run adr link 5 Amends 1 "Amended by"`
-5. **Re-Index:** Whenever you write or modify an ADR, you MUST re-run the semantic search script with the index flag to update your own semantic brain:
-   `pixi run search_adr --index`
-6. **List & Generate Reports:**
-   - To list all existing ADRs: `pixi run adr list`
-   - To generate a table of contents: `pixi run adr generate toc`
-   - To generate a visual relationship graph: `pixi run adr generate graph`
+1. **Search first.** Look for an existing decision before writing a new one:
+   ```bash
+   rg -i "topic keywords" .docs/adr
+   # or read the index table
+   cat .docs/adr/README.md
+   ```
+   If a relevant ADR exists, read it and check its **Status**. Do not silently contradict it;
+   supersede it explicitly.
+
+2. **Number it.** Take the next free four-digit number:
+   ```bash
+   ls .docs/adr | grep -E '^[0-9]{4}-' | sort | tail -1
+   ```
+
+3. **Create the file** from the template:
+   ```bash
+   cp .docs/adr/template.md .docs/adr/0011-your-decision.md
+   ```
+   Fill in Date, Status, Context, Decision, Consequences and Considered Alternatives. Keep it
+   under one page: enough for a future maintainer to understand *why*, not a design document.
+
+4. **Link it.** If it supersedes or amends an existing ADR, update both files' Status sections
+   (e.g. `Superseded by 0012`) and mention the relationship in the new ADR.
+
+5. **Index it.** Add a row to the table in `.docs/adr/README.md`.
+
+6. **Cross-reference.** If the decision changes the architecture, update the relevant
+   Architecture doc.
+
+## Status values
+
+- **Proposed** — written, not yet agreed.
+- **Accepted** — current decision; follow it.
+- **Superseded by NNNN** — historical; read the replacement.
+- **Deprecated** — no longer recommended, but not yet replaced.
+
+## Rules
+
+- One decision per ADR. Do not bundle unrelated choices.
+- Record the alternatives you actually considered and why they lost.
+- Write for a maintainer who joins in two years and has no context.
+- ADRs are immutable history: never rewrite an accepted decision in place; supersede it.

@@ -2,7 +2,7 @@ import argparse
 import glob
 import os
 
-# Suppress huggingface hub warnings and force offline mode (ADR 0003)
+# Suppress huggingface hub warnings and force offline mode
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
 os.environ["HF_HUB_OFFLINE"] = "1"
 
@@ -12,7 +12,7 @@ from chromadb.utils import embedding_functions
 # Get the repository root directory (assumes script is in .agents/skills/adr-management/scripts)
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", ".."))
 
-ADR_DIR = os.path.join(REPO_ROOT, "docs", "adr")
+ADR_DIR = os.path.join(REPO_ROOT, ".docs", "adr")
 DB_DIR = os.path.join(REPO_ROOT, ".chroma_db")
 COLLECTION_NAME = "adrs"
 
@@ -97,7 +97,7 @@ def search_adrs(query):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="ADR Semantic Search Tool")
-    parser.add_argument("--index", action="store_true", help="Index all ADRs in docs/adr/")
+    parser.add_argument("--index", action="store_true", help="Index all ADRs in .docs/adr/")
     parser.add_argument("query", nargs="*", help="The search query")
     
     args = parser.parse_args()

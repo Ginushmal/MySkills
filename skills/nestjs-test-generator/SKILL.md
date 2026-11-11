@@ -1,5 +1,5 @@
 ---
-name: NestJS Test Generator
+name: nestjs-test-generator
 description: >
   MANDATORY SKILL FOR ALL TESTING in this project (including NestJS services, E2E controllers, and ANY normal standard TypeScript file or auxiliary class). Deterministic test generator using Vitest.
   An orchestrator script scans methods via AST, allows for agentic test planning,
