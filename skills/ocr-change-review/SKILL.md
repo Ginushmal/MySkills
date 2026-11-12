@@ -1,6 +1,6 @@
 ---
 name: ocr-change-review
-description: Use after an OpenSpec change is applied and `vp run ready` passes, when the change is substantial enough to need AI review. Runs OCR with full project background, triages findings against the spec, fixes only real issues that do not change agreed architecture or requirements, re-reviews the full diff until clean, and reports fixed vs needs-decision issues.
+description: Use after an OpenSpec change is applied and `vp run ready` passes, when the change is substantial enough to need AI review. Runs OCR with full project background, triages findings against the spec, fixes only real issues that do not change agreed architecture or requirements, re-reviews the full diff until clean, and reports fixed vs needs-decision issues in the transcript, writing no separate report artifact.
 ---
 
 # OCR Change Review
@@ -18,8 +18,8 @@ Run this loop after:
 - the change meets a trigger in §2.
 
 Do not run it for a trivial docs-only or small low-risk change — a README edit, a typo fix, a
-comment-only diff. Record that decision and its reason as a waiver in the apply report and the
-archive summary. If you cannot decide, ask the human. Never skip silently.
+comment-only diff. Record that decision and its reason as a waiver in the change's walkthrough —
+never in a separate report file. If you cannot decide, ask the human. Never skip silently.
 
 ## 2. Scope decision
 
@@ -141,6 +141,9 @@ If a changed file matches no rule, fix the include globs or add a rule, then rer
 
 ## 9. Report
 
+The report is chat output only. Write no report file — no `apply-report.md`, no findings log, no
+sidecar Markdown beside the change's plan artifacts.
+
 Open with one line: change id, files reviewed, findings by severity after triage. Then two
 sections, nothing else.
 
@@ -165,6 +168,10 @@ Fixed:
 
 Omit low severity. If nothing remains, say so in one line.
 
+A fixed finding needs no further writeup. It surfaces in the walkthrough as that stop's `Why`, or
+under "Not covered by this diff" when deferred. No review section unless a finding is the only
+thing that explains a block of code.
+
 ## 10. Stop conditions
 
 Stop and report when any is true:
@@ -179,10 +186,10 @@ Stop and report when any is true:
 
 ## 11. Handoff
 
-After the loop closes, run the `change-walkthrough` skill and write the walkthrough. Only then
-suggest archiving the OpenSpec change; archive requires the walkthrough and all gates
-(root `AGENTS.md` §5). Record the review outcome — fixed, decisions, waivers — in the archive
-summary.
+The loop closes with no new artifact. The walkthrough is produced by the project's own flow, which
+this skill does not run; the review outcome — fixed, decisions, waivers — is content that walkthrough
+carries (§9), not a file of its own. Then suggest archiving; archive requires the walkthrough and
+all gates (root `AGENTS.md` §5).
 
 ## 12. Anti-patterns
 
@@ -192,5 +199,8 @@ summary.
 - Accepting an architecture or requirement change proposed by the reviewer without the human.
 - Silently waiving a medium+ finding, or burying it in summary noise.
 - Committing the background file, the JSON output or any temp artifact.
+- Writing a report artifact — `apply-report.md`, a review log — instead of reporting in the
+  transcript.
+- Adding a review section to the walkthrough when the code stops already carry the reason.
 - Reviewing only the last fix instead of the full diff.
 - Reporting low-severity nitpicks as work.
