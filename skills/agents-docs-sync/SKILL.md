@@ -8,7 +8,8 @@ description: Use when a new rule, convention, tool, command, package, or lesson 
 Add or correct instruction documentation so every rule has exactly one home. This skill edits
 instructions; it does not invent rules, change decisions, or implement code.
 
-Read root `AGENTS.md` §12 and the document split in `openspec/config.yaml` first.
+Read the root `AGENTS.md` section that owns document placement, when the project has one, and the
+document split declared in `openspec/config.yaml`.
 
 ## When to use
 
@@ -43,11 +44,11 @@ Collect before editing:
 | Rule applies to | Home | Constraint |
 |---|---|---|
 | Every app and package | root `AGENTS.md` | Universal rules only; link detail |
-| One app or package | `<app\|package>/AGENTS.md` | ≤80 lines; package-only rules |
-| Architecture fact: topology, ports, flows, data, reliability, deployment | `.docs/ARCHITECTURE.md` | Update in the same change that alters it |
+| One app or package | `<app\|package>/AGENTS.md` | ~120 lines (soft); package-only rules |
+| Architecture fact: topology, ports, flows, data, reliability, deployment | the architecture document (`docs/`, then `.docs/`) | Update in the same change that alters it |
 | Review focus, severity, false-positive guidance | `.opencodereview/rules/*.md` | One topic per file; register in `.opencodereview/rule.json` |
 | Multi-step procedure with decision points | `.agents/skills/<name>/SKILL.md` | Trigger in the description |
-| Expensive-to-reverse decision | `.docs/adr/NNNN-*.md` and `.docs/adr/README.md` | Use `adr-management` |
+| Expensive-to-reverse decision | the project's ADR directory (`NNNN-*.md` plus its index) | Use `adr-management` |
 | Observable feature behavior | `openspec/specs/` | Through an OpenSpec change, not a doc edit |
 | Human onboarding and setup | `README.md`, `CONTRIBUTING.md` (when present) | No agent-only rules |
 
@@ -91,9 +92,11 @@ One rule, one home. When two documents need it, the canonical home states it and
 - No full file trees; at most a 5–10 row map.
 - No marketing, praise, filler, or "remember to".
 - Keep existing headings and ordering; add a section only when no existing section owns it.
-- Line budgets: root `AGENTS.md` ≤180, package `AGENTS.md` ≤80, `.docs/ARCHITECTURE.md` ≤260,
-  every project-authored `SKILL.md` ≤200. Imported or vendor skill references are exempt.
-  Move detail to its proper home instead of compressing prose.
+- Line targets are suggestions, not caps: root `AGENTS.md` ~200, package `AGENTS.md` ~120, the
+  architecture document ~280, every project-authored `SKILL.md` ~220. Imported or vendor skill
+  references are exempt. A project may declare its own in the root `AGENTS.md`; those win. They
+  flag prose, duplication and misplaced detail — not rule count. When the extra lines carry live
+  rules, keep them and note why; never delete or relocate a rule just to reach a target.
 
 ## Validation
 
@@ -101,9 +104,10 @@ One rule, one home. When two documents need it, the canonical home states it and
   unchanged except for the intended rule.
 - Confirm every referenced path exists or is a path explicitly planned in the change.
 - Search again for the rule's keywords; confirm one canonical statement and no contradiction.
-- Count lines (`(Get-Content <file>).Count` or `wc -l <file>`) and compare with the budgets above.
-- `.agents/` and `.docs/` are outside `vp check`'s format and lint scope; do not expect it to
-  validate these edits. Run `vp check` only when the same change also touched code.
+- Count lines (`(Get-Content <file>).Count` or `wc -l <file>`) only to notice drift. Being over a
+  target is not a defect; duplication, prose and misplaced detail are.
+- Check whether the project's formatter and linter cover `.agents/` and the docs directory. When
+  they do not, say so; when the same change also touched code, run the project's check command.
 - If the edit names a command or script, confirm it exists in `package.json` or the tool's help.
 
 ## Output
@@ -114,7 +118,7 @@ Report in this order:
 - **Placement**: the chosen home and why the alternatives lost.
 - **Moved, merged, deleted**: old location → new location, or `none`.
 - **Deferred**: rules that need an ADR, spec, or code change first.
-- **Needs the human**: conflicts or budget overflows you could not resolve.
+- **Needs the human**: conflicts, or growth past a target that you cannot explain.
 
 ## Stop conditions
 
@@ -122,7 +126,8 @@ Stop and ask instead of guessing when:
 
 - scope is unclear, or the rule could be universal or package-specific;
 - the rule contradicts an accepted ADR or an OpenSpec spec;
-- the edit exceeds a line budget after moving detail to its proper home;
+- the file would grow well past its target because detail belongs in another home and you cannot
+  tell which home without a decision;
 - the rule is really a feature requirement, architecture decision, or code change;
 - the evidence is a single incident and the rule would over-constrain future work;
 - satisfying the rule requires changing code, schema, or a public contract.
@@ -135,7 +140,7 @@ Stop and ask instead of guessing when:
 - Adding a rule from one review comment without evidence that it generalizes.
 - Keeping the old copy "just in case"; two copies drift.
 - Restating an ADR instead of linking it.
-- Putting architecture facts in `AGENTS.md` or feature behavior in `.docs/ARCHITECTURE.md`.
+- Putting architecture facts in `AGENTS.md` or feature behavior in the architecture document.
 
 ## Related skills
 

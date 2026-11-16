@@ -5,7 +5,7 @@ description: >
   Updates existing ADRs for minor refinements, only creates new ADRs for truly new
   or fully-replacing decisions. Superseded ADRs get a .suppressed.md filename suffix
   so agents can easily identify active decisions. Optionally updates
-  Architectural_Blueprint.md if infrastructure-level changes occurred.
+  the project's architecture document if infrastructure-level changes occurred.
   Use this skill when the user asks to "create an ADR", "write an ADR", "generate ADRs",
   "document the decisions", or after a major implementation session completes.
   YOU MUST ALWAYS run this skill after openspec-archive skill has being finished runing.
@@ -52,10 +52,13 @@ Create an ADR only when the decision meets one of these criteria. Skip for imple
 List the current **active** ADRs (exclude suppressed ones) and read each one:
 
 ```
-glob: docs/adr/*.md
-exclude: docs/adr/*.suppressed.md
-exclude: docs/adr/0000-adr-template.md
+glob: <adr-dir>/*.md
+exclude: <adr-dir>/*.suppressed.md
+exclude: <adr-dir>/0000-adr-template.md
 ```
+
+Resolve `<adr-dir>` from the project (`docs/adr/` or `.docs/adr/`); the template file name is the
+project's.
 
 For each active ADR, read its **Status** line and **Decision** section.
 Build a topic map:
@@ -165,16 +168,13 @@ exclude: *.suppressed.md     → only active ADRs
 Don't dump everything into one ADR. Split by logical concern:
 
 ```
-  Session outcomes                   ADRs
+  Session outcomes                    ADRs
   ┌──────────────────┐              ┌──────────────────────────┐
-  │ Config file schema│     ──────▶  │ 0009-repo-config-file    │
-  │ Validation strat  │              │   -schema.md             │
+  │ <decision A>      │     ──────▶  │ NNNN-<decision-a>.md     │
   ├──────────────────┤              ├──────────────────────────┤
-  │ 3-layer merge    │     ──────▶  │ 0010-three-layer-config  │
-  │ DB defaults      │              │   -merge.md              │
+  │ <decision B>      │     ──────▶  │ NNNN-<decision-b>.md     │
   ├──────────────────┤              ├──────────────────────────┤
-  │ Message hierarchy │     ──────▶  │ 0011-outbound-messaging  │
-  │ Outbound contract │              │   -contract.md           │
+  │ <decision C>      │     ──────▶  │ NNNN-<decision-c>.md     │
   └──────────────────┘              └──────────────────────────┘
 ```
 
@@ -194,7 +194,7 @@ If this is the first ADR, start at `0001`.
 
 ### Step 7 — Write Each New ADR
 
-Use the template from `docs/adr/0000-adr-template.md`:
+Use the project's ADR template (`0000-adr-template.md` in its ADR directory by default):
 
 ```markdown
 # [NNNN]. [decision title in kebab-case, human-readable]
@@ -246,7 +246,9 @@ Keep ADRs concise. 1-2 pages max. Focus on why, not how.
 
 ### Step 8 — Update the Blueprint (if needed)
 
-The `docs/Architectural_Blueprint.md` is the infrastructure and tech stack reference.
+The project's architecture document — resolve it as `docs/ARCHITECTURE.md`, then
+`docs/Architectural_Blueprint.md`, then `.docs/ARCHITECTURE.md` — is the infrastructure and tech
+stack reference. If the project names it in `AGENTS.md`, that name wins.
 **Only update it when:**
 
 - A new technology is added to the stack (new database, new broker, new library category)
@@ -265,36 +267,7 @@ The `docs/Architectural_Blueprint.md` is the infrastructure and tech stack refer
 When updating, be **minimal** — add a line or paragraph, don't rewrite sections.
 The blueprint is a reference, not a changelog.
 
-### Step 9 — Update the Project TODO (if needed)
-
-The `docs/PROJECT_TODO.md` tracks the overall project implementation status. After generating ADRs for a completed implementation session, check if any work completed major blueprint sections.
-
-**When to update the TODO:**
-
-- A service stub/component listed in the TODO was fully implemented (e.g., GitHub responder, SizeStep, OpenCodeReviewerAdapter)
-- A new architectural component was introduced that is not yet listed in the TODO (e.g., a new pipeline step type, a new notification channel)
-- An entire service or module section is now fully complete (all sub-items `[x]`)
-
-**How to update:**
-
-1. Read `docs/PROJECT_TODO.md`
-2. For each completed component, change its marker from `[~]` or `[ ]` to `[x]`
-3. If a new component was introduced that has no entry, add a new checkbox entry under the appropriate blueprint section
-4. If an entire top-level section is now complete, update the section header marker as well
-
-**Example:** After implementing the real SizeStep logic, update:
-
-```
-- [~] `SizeStep` (stub — hardcoded `isTooLarge = false`)
-```
-
-to:
-
-```
-- [x] `SizeStep` (fully implemented with PR diff size analysis)
-```
-
-### Step 10 — Report
+### Step 9 — Report
 
 Summarize:
 
