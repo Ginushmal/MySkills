@@ -70,7 +70,9 @@ explorer sees why it is still active.
 2. Run `list` first. If an active idea covers the same thought, do **not** add a near-duplicate:
    ask the user "extend idea NNNN or file a new one?". Extend with `note`.
 3. New idea → `add` with the correct `--origin`, a description ≤ 200 chars (script-enforced),
-   and a body carrying the user's raw idea. Use `--body-file` for multi-line bodies.
+   and a body carrying the user's raw idea. Use `--body-file` for multi-line bodies. Do not include
+   the card title: `add` writes `# <name>` itself, and a body whose first non-empty line is an H1 is
+   rejected.
 4. `--context` records where it came from (session topic, change id) — cheap provenance.
 
 Notes are **append-only**: they refine an idea, never rewrite it. If the user's new direction
@@ -115,6 +117,9 @@ Examples:
 ... status 7 --set done --change add-rate-caps --note "Shipped with the dashboard."
 ... status 3 --set rejected --note "User decided against: overlaps with existing queue view."
 ```
+
+`--body` / `--body-file` carry the content below the card title. Do not start the body with an H1 —
+the script writes `# <name>` and rejects a titled body.
 
 Exit codes: `0` ok, `1` validation/usage error (read the message, fix the call), `2` not found.
 

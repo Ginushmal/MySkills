@@ -15,6 +15,7 @@
  *   read   <id>
  *   add    --name <n> --description <d> --origin <user|user-endorsed>
  *          (--body <markdown> | --body-file <path>) [--context <c>]
+ *          body must not start with an H1; the script writes the title
  *   note   <id> --text <t> [--context <c>]
  *   status <id> --set <done|rejected|expired|active>
  *          [--change <change-id>] [--note <n>]
@@ -196,6 +197,26 @@ function cmdRead(dir, positional) {
   process.stdout.write(readFileSync(idea.path, "utf8"));
 }
 
+const BODY_TITLE_RE = /^\s*#\s+\S/;
+
+function firstNonEmptyLine(text) {
+  for (const line of text.split(/\r?\n/)) {
+    if (line.trim() !== "") return line;
+  }
+  return "";
+}
+
+function rejectTitledBody(body) {
+  const first = firstNonEmptyLine(body);
+  if (BODY_TITLE_RE.test(first)) {
+    fail(
+      "idea body must not start with an H1 title; the script writes the card title " +
+        "('# <name>'). Remove the leading '# ...' line from the body and retry. " +
+        `Found: ${first.trim()}`,
+    );
+  }
+}
+
 function cmdAdd(dir, flags) {
   requireFlags(flags, ["name", "description", "origin", "body", "body-file", "context"], [
     "name",
@@ -223,6 +244,7 @@ function cmdAdd(dir, flags) {
     ? readFileSync(resolve(flags["body-file"]), "utf8")
     : flags.body;
   if (!body.trim()) fail("idea body is empty");
+  rejectTitledBody(body);
   const id = existing.reduce((max, i) => Math.max(max, i.id), 0) + 1;
   const fm = {
     id,
@@ -295,6 +317,7 @@ const HELP = `idea-gallery — manage the user's Idea Gallery (run from the repo
   read   <id>                                                full idea file
   add    --name <n> --description <d<=200 chars> --origin <user|user-endorsed>
          (--body <md> | --body-file <path>) [--context <c>]
+         body: do not start it with an H1; the script writes the '# <name>' title
   note   <id> --text <t> [--context <c>]                     append-only refinement
   status <id> --set <done|rejected|expired|active>
          done: --change required | rejected/expired/active(reopen): --note required
